@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # Copyright (C) 2020 Daniel Thompson
+#
+# Modified by Graham Harby to facilitate step count in clock.py and ensure
+# resetting of the step counter is controlled in clock.py
 
 import wasp
 
@@ -34,9 +37,9 @@ class StepCounterApp():
     ICON = icons.app
 
     def __init__(self):
-        watch.accel.reset()
+        #watch.accel.reset()
         self._meter = wasp.widgets.BatteryMeter()
-        self._count = 0
+        self._count = watch.accel.steps
         self._last_clock = ( -1, -1, -1, -1, -1, -1 )
 
     def foreground(self):
@@ -74,7 +77,7 @@ class StepCounterApp():
             draw.string(t1, 48, 12, 240-96)
 
             if now[2] != self._last_clock[2]:
-                watch.accel.steps = 0
+                #watch.accel.steps = 0
                 draw.fill(0, 60, 132-18, 180, 36)
 
             self._last_clock = now

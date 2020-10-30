@@ -37,8 +37,10 @@ def _error(msg):
     sys.stdout.write('\r\n')
 
 def GB(cmd):
+    wasp.system.task = "GB call"
     task = cmd['t']
     del cmd['t']
+    wasp.system.task = task
 
     try:
         if task == 'find':
@@ -49,6 +51,8 @@ def GB(cmd):
             wasp.system.notify(id, cmd)
         elif task == 'notify-':
             wasp.system.unnotify(cmd['id'])
+        elif task == 'weather':
+            wasp.system.weather(cmd)
         else:
             _info('Command "{}" is not implemented'.format(cmd))
     except Exception as e:
@@ -56,5 +60,3 @@ def GB(cmd):
         sys.print_exception(e, msg)
         _error(msg.getvalue())
         msg.close()
-
-

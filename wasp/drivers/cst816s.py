@@ -11,13 +11,11 @@ from machine import Pin
 
 class CST816S:
     """Hynitron CST816S I2C touch controller driver.
-
     .. automethod:: __init__
     """
 
     def __init__(self, bus, intr, rst, schedule=None):
         """Specify the bus used by the touch controller.
-
         :param machine.I2C bus: I2C bus for the CST816S.
         """
         self.i2c = bus
@@ -38,7 +36,6 @@ class CST816S:
 
     def get_touch_data(self, pin_obj):
         """Receive a touch event by interrupt.
-
         Check for a pending touch event and, if an event is pending,
         prepare it ready to go in the event queue.
         """
@@ -59,10 +56,8 @@ class CST816S:
 
     def get_event(self):
         """Receive a touch event.
-
         Check for a pending touch event and, if an event is pending,
         prepare it ready to go in the event queue.
-
         :return: An event record if an event is received, None otherwise.
         """
         if self.event[0] == 0:
@@ -72,14 +67,12 @@ class CST816S:
 
     def reset_touch_data(self):
         """Reset touch data.
-
         Reset touch data, call this function after processing an event.
         """
         self.event[0] = 0
 
     def wake(self):
         """Wake up touch controller chip.
-
         Just reset the chip in order to wake it up
         """
         self._reset()
@@ -87,10 +80,14 @@ class CST816S:
     def sleep(self):
         """Put touch controller chip on sleep mode to save power.
         """
-        # Before we can sent the sleep command we have to reset the
+        # Before we can send the sleep command we have to reset the
         # panel to get the I2C hardware running again...
         self._reset()
-        self.i2c.writeto_mem(21, 0xa5, b'\x03')
+        try:
+            self.i2c.writeto_mem(21, 0xa5, b'\x03')
+        except:
+            # If we can't power down then let's just put it in reset instead
+            self.tp_rst.off()
 
         # Ensure get_event() cannot return anything
         self.event[0] = 0

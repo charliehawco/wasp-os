@@ -104,7 +104,12 @@ class Manager():
         self.notifier = NotificationApp()
         self.notifications = {}
 
-        self.blank_after = 15
+        self.last_note = " "
+        self.srcs = 0b00000000
+        self.wthr = {}
+        #self.new_wthr = 0
+
+        self.blank_after = 60
 
         self._brightness = 2
         self._button = PinHandler(watch.button)
@@ -114,7 +119,7 @@ class Manager():
 
         # TODO: Eventually these should move to main.py
         self.register(ClockApp(), True)
-        self.register(StepCounterApp(), True)
+        self.register(StepCounterApp(), False)
         self.register(StopwatchApp(), True)
         self.register(HeartApp(), True)
         self.register(FlashlightApp(), False)
@@ -204,12 +209,8 @@ class Manager():
             if self.app != app_list[0]:
                 self.switch(app_list[0])
             else:
-                if len(self.notifications):
-                    self.switch(self.notifier)
-                else:
-                    # Nothing to notify... we must handle that here
-                    # otherwise the display will flicker.
-                    watch.vibrator.pulse()
+                #self.task = "clear"
+                watch.vibrator.pulse()
 
         elif direction == EventType.HOME or direction == EventType.BACK:
             if self.app != app_list[0]:
@@ -219,10 +220,38 @@ class Manager():
 
     def notify(self, id, msg):
         self.notifications[id] = msg
+        self.last_note = msg['body']
+        self.set_srcs(msg)
+        watch.vibrator.pulse()
+
+    def set_srcs(self, msg):
+        src = "other"
+        try:
+            src = msg['src'].lower()
+        except Exception as e:
+            src = "other"
+        if src == "viber":
+            self.srcs = self.srcs | 0b00000001
+        elif src == "whatsapp":
+            self.srcs = self.srcs | 0b00000010
+        elif src == "messages":
+            self.srcs = self.srcs | 0b00000100
+        elif src == "k-9 mail":
+            self.srcs = self.srcs | 0b00001000
+        else:
+            self.srcs = self.srcs | 0b00010000
 
     def unnotify(self, id):
         if id in self.notifications:
             del self.notifications[id]
+        self.srcs &= 0b10000000
+        self.notifications = {}
+        self.last_note = " "
+
+    def weather(self, msg):
+        self.wthr = msg
+        self.srcs |= 0b10000000
+        #self.new_wthr = 1
 
     def request_event(self, event_mask):
         """Subscribe to events.
@@ -263,6 +292,7 @@ class Manager():
         if 'wake' in dir(self.app):
             self.app.wake()
         watch.backlight.set(self._brightness)
+        watch.touch.reset_touch_data()
         watch.touch.wake()
 
         self.keep_awake()
