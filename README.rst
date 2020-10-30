@@ -1,6 +1,21 @@
 Watch Application System in Python
 ==================================
 
+.. image:: https://i.ytimg.com/an_webp/1AmsDaFMEF0/mqdefault_6s.webp?du=3000&sqp=CMjC8fwF&rs=AOn4CLD3C345PBS61JQZMTZzOLrMyI0uNw
+   :target: https://www.youtube.com/watch?v=1AmsDaFMEF0
+   :alt: wasp-os: StarTrek theme for Pine64 PineTime
+   :width: 320
+   :height: 240
+
+`StarTrek themed wasp-os for Pine64 PineTime <https://www.youtube.com/watch?v=1AmsDaFMEF0>`_
+
+Based on Daniel Thompson's wasp-os this is an implementation to add a StarTrek 
+themed watch face with integrated notifications, step counter and weather.
+Meant as a 'for me' project it works as a daily driver and code is posted
+here should it help others play with wasp-os.
+
+All instructions below relate to the stock wasp-os and kept for reference.
+
 Introduction
 ------------
 
